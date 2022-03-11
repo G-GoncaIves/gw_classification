@@ -1,0 +1,122 @@
+{
+	"name": "AST",
+	"description": "The model used is based on the work published by another group. ('https://arxiv.org/abs/2104.01778', 'https://github.com/YuanGongND/ast')",
+	"help": "NO HELP",
+	"args": [
+				{
+					"name" : "data_train",
+					"type" : "str",
+					"help" : "path to the training data.",
+					"metavar" : ""
+				},
+				{
+					"name" : "epochs",
+					"type" : "int",
+					"help" : "number of training epochs.",
+					"metavar" : ""
+				},
+				{
+					"name" : "batch_size",
+					"type" : "int",
+					"help" : "batch size used for training.",
+					"metavar" : ""
+				},
+				{
+					"name" : "num_workers",
+					"type" : "int",
+					"help" : "number of subprocesses for data loading.",
+					"metavar" : ""
+				},
+				{
+					"name" : "data_shuffle",
+					"action" : "store_true",
+					"help" : "set to true to shuffle data at every epoch."
+				},
+				{
+					"name" : "model_dir",
+					"type" : "str",
+					"help" : "path to the dir with the module's scripts.",
+					"metavar" : ""
+				},
+				{
+					"name" : "exp_dir",
+					"type" : "str",
+					"help" : "directory to dump output.",
+					"metavar" : ""
+				},
+				{
+					"name" : "lr",
+					"type" : "float",
+					"help" : "learning rate to use for training.",
+					"metavar" : ""
+				},
+				{
+					"name" : "save_model",
+					"action" : "store_true",
+					"help" : "set to true to save the model every n steps."
+				},
+				{
+					"name" : "freqm",
+					"type" : "int",
+					"help" : "frequency mask max length.",
+					"metavar" : ""
+				},
+				{
+					"name" : "timem",
+					"type" : "int",
+					"help" : "time mask max length.",
+					"metavar" : ""
+				},
+				{
+					"name" : "fstride",
+					"type" : "int",
+					"help" : "soft split freq stride, overlap=patch_size-stride.",
+					"metavar" : ""
+				},
+				{
+					"name" : "tstride",
+					"type" : "int",
+					"help" : "soft split time stride, overlap=patch_size-stride.",
+					"metavar" : ""
+				},
+				{
+					"name" : "imagenet_pretrain",
+					"action" : "store_true",
+					"help" : "set to true to use ImageNet pretrained audio spectrogram transformer model."
+				},
+				{
+					"name" : "audioset_pretrain",
+					"action" : "store_true",
+					"help" : "set to true to use ImageNet and audioset pretrained audio spectrogram transformer model."
+				},
+				{
+					"name" : "modules_dir",
+					"type" : "str",
+					"help" : "directory to ast modules.",
+					"metavar" : ""
+				},
+				{
+					"name" : "data_val",
+					"type" : "str",
+					"help" : "validation directory.",
+					"metavar" : ""
+				},
+				{
+					"name" : "n_class",
+					"type" : "int",
+					"help" : "number of classes.",
+					"metavar" : ""
+				},
+				{
+					"name" : "data_type",
+					"type" : "str",
+					"help" : "type of data store in the hdf5",
+					"metavar" : ""
+				},
+				{
+					"name" : "verbose",
+					"action" : "store_true",
+					"help" : "set to true to get train porgress information."
+				}
+			]
+}
