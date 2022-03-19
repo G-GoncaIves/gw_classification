@@ -20,6 +20,8 @@ def recibo(
 				best_avg_pre,
 				best_avg_recall,
 
+				peak_cuda_mem,
+
 				current_state_loc, 
 				best_state_loc,
 				side=None,
@@ -62,9 +64,15 @@ def recibo(
 	str_list.append(f"    Avg Recall = {best_avg_recall:.4f}")
 
 	str_list.append("")
+	str_list.append(" Resource Usage:")
+	str_list.append(f"      Peak CUDA mem (Gloabl)  = {peak_cuda_mem}")
+
+	str_list.append("")
 	str_list.append(f" Saved State Locations:")
 	str_list.append(f"    Current State Loc = {current_state_loc}")
 	str_list.append(f"    Best State Loc = {best_state_loc}")
+	
+	str_list.append("")
 
 	if not side:
 
@@ -73,7 +81,7 @@ def recibo(
 	top = bottom = "="*side
 
 	recibo = "\n\t" + top + "\n" 
-    
+	
 	for line in str_list:
 
 		line_len = len(line)

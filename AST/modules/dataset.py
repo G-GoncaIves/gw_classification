@@ -151,7 +151,9 @@ class Spectrograms(My_DataSet):
 
     def load_spectrograms(self):
 
+        self.count = 0
         for k in tqdm(self.keys, leave=False):
+
 
             # This is an instance of 'h5py._hl.dataset.Dataset', hence the name
             spec_dataset = self.data["waveforms"][k]
@@ -184,6 +186,7 @@ class Spectrograms(My_DataSet):
             
                     self.spec_resize_ex = False
 
+            self.count += 1
             self.spectograms.append(spec_tensor.half())
             self.labels.append(label)
 

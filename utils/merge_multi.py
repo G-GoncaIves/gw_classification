@@ -1,11 +1,17 @@
 import glob
 import os
 import sys
+import argparse
 
 import h5py
 import tqdm
 
-base_dir = "/home/goncalo/GW_pycbc/AST/modules/test_dataset/valid"
+
+parser = argparse.ArgumentParser(description="Generate GW time-series data.")
+parser.add_argument("-w", metavar="PATH", type=str, help="Root directory where sub_directories with the EOS-specific hdf5 are stored")
+
+args = parser.parse_args()
+base_dir = args.w 
 
 print(f"Starging merge ({base_dir})")
 files = glob.glob(os.path.join(base_dir, "*/dataset.h5"))
@@ -21,8 +27,4 @@ with h5py.File(os.path.join(base_dir, "dataset.h5"), "w") as dataset:
 
                 part.copy(v, grp, name=f"ts_{i:08d}")
                 i += 1
-# print("Cleaning...")
-# for f in files:
-#     os.remove(f)
-
 print("Done.")

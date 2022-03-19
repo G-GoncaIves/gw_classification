@@ -1,25 +1,27 @@
 #!/bin/bash
 source /home/goncalo/gw_env/bin/activate
 
-N=80
+N=16000
 POLARIZATION=hp
 MODEL_FILE="/home/goncalo/GW_pycbc/AST/modules/models.csv"
-PROCESS=False
-TYPE_DS="valid"
+TYPE_DS="train"
 
-JOB_DIR=/home/goncalo/GW_pycbc/AST/modules
-SCRIPT=${JOB_DIR}/generate_mpi.py
+JOB_DIR=/home/goncalo/gw_classification/utils
 
+SCRIPT1=${JOB_DIR}/generate_mpi.py
+SCRIPT2=${JOB_DIR}/spec_ex.py
+SCRIPT3=${JOB_DIR}/merge_multi.py
 
-for EOS in BSk20 TM1 SLY9 NL3 GM1 DDHd DD2 BSR6 BSR2 BSk21
+OUT_DIR=/home/goncalo/gw_classification/dataset
+
+for EOS in BSk20 TM1 SLY9
 
 do
-mkdir test_dataset/${TYPE_DS}/${EOS}
 
-EOS_DIR=${JOB_DIR}/test_dataset/${TYPE_DS}/${EOS}
+EOS_DIR=${OUT_DIR}/${TYPE_DS}/${EOS}
+mkdir -p ${EOS_DIR}
 
-mpirun /home/goncalo/gw_env/bin/python ${SCRIPT} \
---process ${N} \
+mpirun /home/goncalo/gw_env/bin/python ${SCRIPT1} ${N} \
 -w ${EOS_DIR} \
 -p ${POLARIZATION} \
 --model-name ${EOS} \
@@ -27,5 +29,5 @@ mpirun /home/goncalo/gw_env/bin/python ${SCRIPT} \
 --process
 done
 
-/home/goncalo/gw_env/bin/python test_md.py
-/home/goncalo/gw_env/bin/python merge_multi.py
+/home/goncalo/gw_env/bin/python ${SCRIPT2} -w ${OUT_DIR}/${TYPE_DS}
+/home/goncalo/gw_env/bin/python ${SCRIPT3} -w ${OUT_DIR}/${TYPE_DS}

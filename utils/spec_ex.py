@@ -3,6 +3,7 @@ import atexit
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+import argparse
 
 parser = argparse.ArgumentParser(description="Generate GW time-series data.")
 parser.add_argument("-w", metavar="PATH", type=str, help="Root directory where sub_directories with the EOS-specific hdf5 are stored")

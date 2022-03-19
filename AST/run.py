@@ -61,16 +61,7 @@ def train_model(
 	else:
 		global_dataset = dataset(args.data_train)
 		
-	if verbose:
-		time = datetime.now() - global_start_time
-		print(f"\t > Converting Waveforms to Spectrograms ... [{time}]")
-		global_dataset.load_spectrograms()
-		time = datetime.now() - global_start_time
-		print(f"\t > Spectrogram conversion successful. [{time}]                              ")
-	else:
-		global_dataset.load_spectrograms()
-
-	train_ratio, val_ratio = int(len(global_dataset)*0.2), int(len(global_dataset)*0.8)
+	train_ratio, val_ratio = int(len(global_dataset)*0.8), int(len(global_dataset)*0.2)
 	train_dataset, val_dataset = torch.utils.data.random_split(global_dataset, [train_ratio, val_ratio])
 	
 	if verbose:

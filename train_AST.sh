@@ -2,8 +2,8 @@
 model=AST
 
 # Training Parameters:
-lr=1e-5
-epochs=1
+lr=1e-4
+epochs=100
 
 # Classifier Parameters:
 freqm=128
@@ -16,13 +16,13 @@ batch_size=50
 num_workers=1
 
 # DataSet Paramaeters:
-n_class=10
+n_class=3
 data_type=spectrograms
 
 # References:
 exp_dir=/home/goncalo/gw_classification/AST/output_files # Path to dir used to store all outputs
-tr_data=/home/goncalo/GW_pycbc/AST/modules/test_dataset/train/dataset.h5 # Path to data used for trainig
-te_data=/home/goncalo/GW_pycbc/AST/modules/test_dataset/train/dataset.h5  # Path to data used for testing
+tr_data=/home/goncalo/gw_classification/dataset/train/dataset.h5 # Path to data used for trainig
+te_data=/home/goncalo/gw_classification/dataset/train/dataset.h5  # Path to data used for testing
 
 CUDA_CACHE_DISABLE=1 python3 -W ignore run.py $model \
 --data_train $tr_data \
