@@ -14,8 +14,10 @@ eos_dir = args.w
 
 eos_available = os.listdir(eos_dir)
 
-for eos in eos_available:
+dir_filter = lambda x: ".h5" not in x
+eos_available = list(filter(dir_filter, eos_available))
 
+for eos in eos_available:
     eos_h5_path = os.path.join(eos_dir, eos, "dataset.h5")
     
     data = h5py.File(eos_h5_path, "r")
@@ -31,4 +33,5 @@ for eos in eos_available:
     waveform_array = np.asarray(waveform)
 
     spec_file_name = os.path.join(eos_dir, eos, f"{eos}_spec.png")
+    print(f"Spectorgram example saved: {spec_file_name}")
     plt.imsave(spec_file_name, waveform_array, cmap="turbo", origin="lower")
