@@ -1,7 +1,7 @@
 #!/bin/bash
 source /home/goncalo/gw_env/bin/activate
 
-N=16000
+N=16
 POLARIZATION=hp
 MODEL_FILE="/home/goncalo/GW_pycbc/AST/modules/models.csv"
 TYPE_DS="train"

@@ -125,7 +125,7 @@ class Models:
 class Generator:
 
 	def __init__(self, rank: int, work_dir: str = "gw_ts", model_name: str = None, model_file: str = None,
-				 sample_rate: float = 4*4096, distance: float = 39, inclination: float = 10, fmin: float = 20,
+				 sample_rate: float = 4096, distance: float = 39, inclination: float = 10, fmin: float = 20,
 				 approximant: str = "IMRPhenomPv2_NRTidalv2"):
 
 		# General config
@@ -133,8 +133,8 @@ class Generator:
 		self.work_dir = os.path.normpath(work_dir)
 
 		# Processing config
-		self.process_params = {"out_size": 2048*16,
-							   "crop_radius": 2048*8-100,
+		self.process_params = {"out_size": 2048*8,
+							   "crop_radius": 2048*4-100,
 							   "centered": False
 							   }
 
@@ -200,11 +200,11 @@ class Generator:
 		spec = abs(cqt(
 			array, 
 			sr=self.sample_rate, 
-			hop_length=256, 
+			hop_length=128, 
 			pad_mode="constant", 
 			fmin=32, 
-			bins_per_octave=32, 
-			n_bins=128, 
+			bins_per_octave=64, 
+			n_bins=256, 
 			tuning=0
 			))
 
