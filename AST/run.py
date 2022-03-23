@@ -36,22 +36,6 @@ def train_model(
 
 	target_length = 1024
 	
-	audio_conf = {
-				'num_mel_bins': 128, 
-	      		'target_length': target_length, 
-	      		'freqm': args.freqm, 
-	      		'timem': args.timem, 
-	      		'mode': 'train'
-	     	}
-
-	val_audio_conf = {
-					'num_mel_bins': 128, 
-		  			'target_length': target_length,
-		  			'freqm': 0,
-		  			'timem': 0, 
-		  			'mode': 'evaluation'
-		 		}
-
 	if verbose:
 		time = datetime.now() - global_start_time
 		print(f"\t > Loading Dataset to memory ... [{time}]")
@@ -61,8 +45,10 @@ def train_model(
 	else:
 		global_dataset = dataset(args.data_train)
 		
-	train_ratio, val_ratio = int(len(global_dataset)*0.8), int(len(global_dataset)*0.2)
-	train_dataset, val_dataset = torch.utils.data.random_split(global_dataset, [train_ratio, val_ratio])
+	train_ratio, val_ratio = 0.8, 0.2
+	train_portion = int(len(global_dataset) * train_ratio)
+	val_portion = len(global_dataset) - train_portion
+	train_dataset, val_dataset = torch.utils.data.random_split(global_dataset, [train_portion, val_portion])
 	
 	if verbose:
 		time = datetime.now() - global_start_time
@@ -88,8 +74,8 @@ def train_model(
 	    				label_dim=args.n_class, 
 	    				fstride=args.fstride, 
 	    				tstride=args.tstride, 
-	    				input_fdim=128,
-                    	input_tdim=128, 
+	    				input_fdim=args.fdim,
+                    	input_tdim=args.tdim, 
 	    				imagenet_pretrain=args.imagenet_pretrain,
                     	audioset_pretrain=args.audioset_pretrain, 
 	    				model_size='base384', 

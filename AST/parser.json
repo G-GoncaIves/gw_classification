@@ -56,15 +56,15 @@
 					"help" : "set to true to save the model every n steps."
 				},
 				{
-					"name" : "freqm",
+					"name" : "fdim",
 					"type" : "int",
-					"help" : "frequency mask max length.",
+					"help" : "dimension of frequency bins.",
 					"metavar" : ""
 				},
 				{
-					"name" : "timem",
+					"name" : "tdim",
 					"type" : "int",
-					"help" : "time mask max length.",
+					"help" : "dimension of time bins.",
 					"metavar" : ""
 				},
 				{
