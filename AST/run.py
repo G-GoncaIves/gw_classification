@@ -1,12 +1,15 @@
-import argparse
+# Built-in:
 import os
 import sys
-import torch
-import ast
-import torch.optim as optim
 import pickle
-import tqdm as tqdm
 from datetime import datetime
+
+# Installed:
+import torch
+import argparse
+import tqdm as tqdm
+import torch.optim as optim
+#import ast
 
 torch.cuda.empty_cache()
 def train_model(

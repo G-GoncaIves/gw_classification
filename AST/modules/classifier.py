@@ -5,13 +5,15 @@
 # @Email   : yuangong@mit.edu
 # @File    : ast_models.py
 
+# Built-in:
+import os
+import wget
+
+# Installed:
+import timm
 import torch
 import torch.nn as nn
 from torch.cuda.amp import autocast
-import os
-import wget
-#os.environ['TORCH_HOME'] = '../../pretrained_models'
-import timm
 from timm.models.layers import to_2tuple,trunc_normal_
 
 # override the timm package to relax the input shape constraint.

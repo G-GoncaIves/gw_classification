@@ -5,20 +5,23 @@
 # @Email   : yuangong@mit.edu
 # @File    : traintest.py
 
-import datetime
+# Built-in:
 import os
 import sys
-
 import time
-import torch
-from torch import nn
-import numpy as np
 import pickle
-from torch.cuda.amp import autocast, GradScaler
-from sklearn import metrics
-from .recibo import recibo, progress_csv
-from tqdm import tqdm
+import datetime
 
+# Installed:
+import torch
+import numpy as np
+from torch import nn
+from tqdm import tqdm
+from sklearn import metrics
+from torch.cuda.amp import autocast, GradScaler
+
+# Custom:
+from .recibo import recibo, progress_csv
 
 class AverageMeter(object):
 	"""Computes and stores the average and current value"""
