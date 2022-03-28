@@ -13,6 +13,7 @@ import os
 from torchvision.transforms import Resize
 import matplotlib.pyplot as plt
 
+from .recibo import progress_csv
 
 class My_DataSet(Dataset):
     def __init__(
@@ -40,6 +41,29 @@ class My_DataSet(Dataset):
         keys = []
         h5_file.visit(lambda key: keys.append(key) if isinstance(h5_file[key], h5py.Dataset) else None)
         return keys
+
+    """
+    def record_stats(self, csv_path):
+
+        for n, key in enumerate(self.keys):
+		
+		params = self.data["waveforms"][key].attrs
+		m1 = params["mass1"]
+		m2 = params["mass2"]
+		lambda1 = params["lambda1"]
+		lambda2 = params["lambda2"]
+	
+		access_type = "a+" if os.path.isfile(csv_path) else "w+"
+		progress_csv(
+				n,
+				m1,
+				m2,
+				lambda1,
+				lambda2,
+				access_type = access_type,
+				csv_path = csv_path
+				)
+    """
 
     def __getitem__(self, idx):
         """

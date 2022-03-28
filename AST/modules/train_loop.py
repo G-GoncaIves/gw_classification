@@ -16,7 +16,7 @@ import numpy as np
 import pickle
 from torch.cuda.amp import autocast, GradScaler
 from sklearn import metrics
-from .recibo import recibo
+from .recibo import recibo, progress_csv
 from tqdm import tqdm
 
 
@@ -219,6 +219,22 @@ def train(audio_model, train_loader, val_loader, train_conf):
 			best_state_loc = best_model_path,
 			recibo_location = recibo_path
 			)
+		
+		# Saves metrics progression to a csv.
+		csv_path = os.path.join(exp_dir, "metrics.csv")
+		access_type = "a+" if os.path.isfile(csv_path) else "w+"
+		progress_csv(
+				epoch,
+				train_loss,
+				valid_loss,
+				mAP,
+				acc,
+				mAUC,
+				average_precision,
+				average_recall,
+				access_type=access_type,
+				csv_path=csv_path
+				) 
 
 		scheduler.step()
 

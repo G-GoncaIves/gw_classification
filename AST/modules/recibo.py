@@ -92,6 +92,21 @@ def recibo(
 	with open(recibo_location, "w") as f:
 		f.write(recibo)
 
+def progress_csv(
+		*args,
+		access_type=None,
+		csv_path=None
+		):
+	
+	line_string = ""
+	for arg in args[:-1]:
+		line_string += f"{arg};"
+	line_string += f"{args[-1]}\n"
+
+	with open(csv_path, access_type) as f: 
+		f.write(line_string)
+
+
 if __name__ == "__main__":
 	
 	import os

@@ -9,18 +9,12 @@
 #SBATCH -A mlgw
 
 # number of requested nodes
-#SBATCH --nodes=2
-##SBATCH --ntasks=1
-
+#SBATCH --nodes=1
+#SBATCH --part=cpu2
 #SBATCH --exclusive
 
-##SBATCH --ntasks-per-node=1
-##SBATCH --cpus-per-task=80
-##SBATCH --mem=64G
-#SBATCH --part=cpu1
-
 # requested runtime
-#SBATCH --time=48:00:00
+#SBATCH --time=24:00:00
 
 # Path to the standard output and error files relative to the working directory
 #SBATCH --output=/veracruz/home/g/ggoncalves/gw_classification/jobs/job_generate_%j.log
@@ -29,44 +23,38 @@
 #                     User Construction Section
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-ml load OpenBLAS
 ml load Python
-ml load OpenMPI
 ml load libsndfile
 ml load HDF5
 
 HOME_DIR=/veracruz/home/g/ggoncalves/gw_classification
+SCRIPT_DIR=${HOME_DIR}/utils
+OUT_DIR=/veracruz/projects/m/mlgw/class_dataset
 
 # Install requirements
 python -m venv ${HOME_DIR}/utils/venv
 source ${HOME_DIR}/utils/venv/bin/activate
 
-pip install --upgrade pip==21.3.1
+pip install --upgrade pip
 pip install -r ${HOME_DIR}/requirements.txt
 
-N=160
+N=100000
 POLARIZATION=hp
-MODEL_FILE=${HOME_DIR}/utils/models.csv
-
+MODEL_FILE=${SCRIPT_DIR}/models.csv
 TYPE_DS="train"
 
-JOB_DIR=${HOME_DIR}/utils
+SCRIPT_1=${SCRIPT_DIR}/generate_joblib.py
+SCRIPT_2=${SCRIPT_DIR}/merge_multi.py
+SCRIPT_3=${SCRIPT_DIR}/spec_ex.py
 
-SCRIPT1=${JOB_DIR}/generate_mpi.py
 
-# SCRIPT2=${JOB_DIR}/spec_ex.py
-# SCRIPT3=${JOB_DIR}/merge_multi.py
-
-OUT_DIR=/veracruz/projects/m/mlgw/class_dataset
-
-for EOS in BSk20 TM1 SLY9
-
+for EOS in DD2 NL3
 do
 
 EOS_DIR=${OUT_DIR}/${TYPE_DS}/${EOS}
 mkdir -p ${EOS_DIR}
 
-mpirun python ${SCRIPT1} ${N} \
+python ${SCRIPT_1} ${N} \
 -w ${EOS_DIR} \
 -p ${POLARIZATION} \
 --model-name ${EOS} \
@@ -74,5 +62,7 @@ mpirun python ${SCRIPT1} ${N} \
 --process
 done
 
-# /home/goncalo/gw_env/bin/python ${SCRIPT2} -w ${OUT_DIR}/${TYPE_DS}
-# /home/goncalo/gw_env/bin/python ${SCRIPT3} -w ${OUT_DIR}/${TYPE_DS}
+python ${SCRIPT_2} -w ${OUT_DIR}/${TYPE_DS}
+python ${SCRIPT_3} -w ${OUT_DIR}/${TYPE_DS}
+
+rm -rf ${HOME_DIR}/utils/venv
