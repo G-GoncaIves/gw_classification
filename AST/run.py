@@ -45,6 +45,8 @@ def train_model(
 		global_dataset = dataset(args.data_train, verbose=True)
 		time = datetime.now() - global_start_time
 		print(f"\t > Global Dataset successfully loaded to memory. [{time}]")
+		csv_path = os.path.join(args.exp_dir, "stats.csv")
+		global_dataset.record_stats(csv_path=csv_path)
 	else:
 		global_dataset = dataset(args.data_train)
 		
