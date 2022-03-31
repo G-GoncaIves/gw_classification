@@ -145,8 +145,8 @@ class Generator:
 		self.work_dir = os.path.normpath(work_dir)
 
 		# Processing config
-		self.process_params = {"out_size": 2048*8,
-							   "crop_radius": 2048*4-100,
+		self.process_params = {"out_size": sample_rate*2,
+							   "crop_radius": sample_rate-100,
 							   "centered": False
 							   }
 
@@ -206,13 +206,14 @@ class Generator:
 		spec = abs(cqt(
 				array, 
 				sr=self.sample_rate, 
-				hop_length=128, 
+				hop_length=64, 
 				pad_mode="constant", 
 				fmin=32, 
-				bins_per_octave=64, 
-				n_bins=256, 
+				bins_per_octave=28, 
+				n_bins=128, 
 				tuning=0
-				))
+				)).transpose()
+		# ~761 hertz
 
 		return spec
 
@@ -252,7 +253,9 @@ class Generator:
 
 				ts_hp = ts_hp/np.max(ts_hp)
 
-				spec_hp = self.gen_spec(ts_hp).astype(np.float16)
+				spec_hp = self.gen_spec(ts_hp)
+				spec_hp = spec_hp / np.max(spec_hp)
+				spec_hp = spec_hp.astype(np.float16)
 				meta_data = {**config, "polarization": "hp", "model": self.model_name}
 				run_hp = Spectrogram(data=spec_hp, metadata=meta_data)
 
@@ -265,7 +268,9 @@ class Generator:
 
 				ts_hc = ts_hc/np.max(ts_hc)
 
-				spec_hc = self.gen_spec(ts_hc).astype(np.float16)
+				spec_hc = self.gen_spec(ts_hc)
+				spec_hc = spec_hc / np.amx(spec_hc)
+				spec_hc = spec_hc.astype(np.float16)
 				meta_data = {**config, "polarization": "hc", "model": self.model_name}
 				run_hc = Spectrogram(data=spec_hc, metadata=meta_data)
 

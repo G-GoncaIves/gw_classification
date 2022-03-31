@@ -14,7 +14,7 @@ eos_dir = args.w
 
 eos_available = os.listdir(eos_dir)
 
-dir_filter = lambda x: ".h5" not in x
+dir_filter = lambda x: "." not in x
 eos_available = list(filter(dir_filter, eos_available))
 
 for eos in eos_available:
