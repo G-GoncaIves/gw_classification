@@ -39,6 +39,9 @@ class My_DataSet(Dataset):
 		unique_labels = list(set(self.data["waveforms"][d].attrs["model"] for d in self.keys))
 		self.one_hot = {name: torch.FloatTensor([0]*i + [1] + [0]*(len(unique_labels)-i-1)) for i, name in enumerate(unique_labels)}
 
+		# Variable that dictates wether SpecAug is aplied or not:
+		self.spec_aug = None
+
 
 	def get_keys(self, h5_file):
 		keys = []
@@ -70,13 +73,20 @@ class My_DataSet(Dataset):
 
 	def __getitem__(self, idx):
 		"""
-		returns: image, audio, nframes
-		where image is a FloatTensor of size (3, H, W)
-		audio is a FloatTensor of size (N_freq, N_frames) for spectrogram, or (N_frames) for waveform
-		nframes is an integer
 		"""
 		spec = self.spectograms[idx]
 		label = self.labels[idx]
+
+		if self.spec_aug == True:
+
+			time_bins, freq_bins = spec.shape
+			freq_mask = torchaudio.transforms.FrequencyMasking(freq_bins/2)
+			time_mask = torchaudio.transforms.TimeMasking(time_bins/2)
+
+			spec = spec.to(torch.float32)
+			spec = freq_mask(spec)
+			spec = time_mask(spec)
+			spec = spec.to(torch.float16)
 
 		# The output spec shape is [time_frame_num, frequency_bins], e.g., [1024, 128]
 		return spec, label
@@ -178,7 +188,6 @@ class Spectrograms(My_DataSet):
 
 	def load_spectrograms(self):
 
-		self.count = 0
 		for k in tqdm(self.keys, leave=False):
 
 
@@ -195,6 +204,7 @@ class Spectrograms(My_DataSet):
 			spec_dims = spec_tensor.shape
 			assert len(spec_dims) == 2, "Spectrograms in unexpected format."
 			i, j = spec_dims
+			# i - time bins number ; j - frequency bins number
 			if j != 128:
 
 				transform = Resize((i,128))
@@ -213,7 +223,6 @@ class Spectrograms(My_DataSet):
 			
 					self.spec_resize_ex = False
 
-			self.count += 1
 			self.spectograms.append(spec_tensor.half())
 			self.labels.append(label)
 

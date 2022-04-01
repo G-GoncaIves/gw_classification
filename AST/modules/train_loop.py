@@ -101,13 +101,15 @@ def train(audio_model, train_loader, val_loader, train_conf):
 		epoch_progress_bar_generator = epoch_progress_bar_generator_silent 
 		batch_progress_bar_generator = batch_progress_bar_generator_silent
 		
+	# Enable SpecAug for training:
+	train_loader.dataset.spec_aug = True
+	# Disable SpecAug for validation:
+	val_loader.dataset.spec_aug = False
+
 	for epoch in epoch_progress_bar_generator(total_epochs=train_conf["epochs"]):
 		begin_time = time.time()
 		end_time = time.time()
 		audio_model.train()
-
-		# Enable SpecAug
-		train_loader.dataset.dataset.augm = True
 
 		for i, (audio_input, labels) in batch_progress_bar_generator(loader=train_loader, title="train"):
 
@@ -153,11 +155,8 @@ def train(audio_model, train_loader, val_loader, train_conf):
 			end_time = time.time()
 			global_step += 1
 
-		# Disable SpecAug
-		val_loader.dataset.dataset.augm = False
-
 		#
-		stats, valid_loss = validate(audio_model, val_loader, train_conf, epoch, verbose, bar_generator=batch_progress_bar_generator)
+		stats, valid_loss = validate(audio_model, val_loader, train_conf, verbose, bar_generator=batch_progress_bar_generator)
 
 		mAP = np.mean([stat['AP'] for stat in stats])
 		mAUC = np.mean([stat['auc'] for stat in stats])
@@ -251,7 +250,7 @@ def train(audio_model, train_loader, val_loader, train_conf):
 		per_sample_dnn_time.reset()
 		
 
-def validate(audio_model, val_loader, train_conf, epoch, verbose, bar_generator):
+def validate(audio_model, val_loader, train_conf, verbose, bar_generator):
 	device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 	batch_time = AverageMeter()
 	if not isinstance(audio_model, nn.DataParallel):
