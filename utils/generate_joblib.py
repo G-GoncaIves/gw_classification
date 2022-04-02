@@ -16,6 +16,8 @@ from joblib import Parallel, delayed
 from pycbc.distributions.angular import SinAngle
 from tqdm import tqdm
 
+from scipy.signal.windows import tukey
+
 from processing import ReShape
 
 def start_logger_if_necessary():
@@ -202,6 +204,10 @@ class Generator:
 		return {**model_config, **gen_config}
 
 	def gen_spec(self, array):
+
+		window = tukey(M=int(len(array)))
+		window[int(0.5*len(array)):] = 1
+		array *= window
 
 		spec = abs(cqt(
 				array, 
