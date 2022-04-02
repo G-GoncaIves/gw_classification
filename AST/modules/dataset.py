@@ -80,8 +80,8 @@ class My_DataSet(Dataset):
 		if self.spec_aug == True:
 
 			time_bins, freq_bins = spec.shape
-			freq_mask = torchaudio.transforms.FrequencyMasking(freq_bins/2)
-			time_mask = torchaudio.transforms.TimeMasking(time_bins/2)
+			freq_mask = torchaudio.transforms.FrequencyMasking(freq_bins)
+			time_mask = torchaudio.transforms.TimeMasking(time_bins)
 
 			spec = spec.to(torch.float32)
 			spec = freq_mask(spec)
