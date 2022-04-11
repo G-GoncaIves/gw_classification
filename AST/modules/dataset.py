@@ -21,7 +21,8 @@ from .recibo import progress_csv
 class My_DataSet(Dataset):
 	def __init__(
 		self, 
-		input_hdf5_path: str
+		input_hdf5_path: str,
+		label_dict: dict = None
 		):
 
 		assert os.path.isfile(input_hdf5_path), f"Input Data File not found. Checked: {input_hdf5_path}"
@@ -37,7 +38,12 @@ class My_DataSet(Dataset):
 
 		# Converts labels into the one hot format:
 		unique_labels = list(set(self.data["waveforms"][d].attrs["model"] for d in self.keys))
-		self.one_hot = {name: torch.FloatTensor([0]*i + [1] + [0]*(len(unique_labels)-i-1)) for i, name in enumerate(unique_labels)}
+
+		if label_dict is None:
+			self.one_hot = {name: torch.FloatTensor([0]*i + [1] + [0]*(len(unique_labels)-i-1)) for i, name in enumerate(unique_labels)}
+			print(f"\n\n\n One hot dict: \n {self.one_hot} \n\n\n")
+		else:
+			self.one_hot = label_dict
 
 		# Variable that dictates wether SpecAug is aplied or not:
 		self.spec_aug = None
@@ -102,10 +108,11 @@ class WaveForms(My_DataSet):
 		audio_conf: dict, 
 		norm_mean: float = None, 
 		norm_std: float = None,
-		verbose=False
+		verbose=False,
+		label_dict:dict = None
 		):
 
-		super().__init__(self, input_hdf5_path=input_hdf5_path)
+		super().__init__(self, input_hdf5_path=input_hdf5_path, label_dict=label_dict)
 		assert all([required_key in audio_conf.keys() for required_key in ["target_length","num_mel_bins","freqm","timem"]]), "Configuration Dict missing required parameters."
 
 		self.audio_conf = audio_conf
@@ -174,10 +181,11 @@ class Spectrograms(My_DataSet):
 		self, 
 		input_hdf5_path: str,
 		verbose=False,
-		spec_rezise_ex=True
+		spec_rezise_ex=True,
+		label_dict:dict = None
 		):
 		
-		super().__init__(input_hdf5_path)
+		super().__init__(input_hdf5_path=input_hdf5_path, label_dict=label_dict)
 
 		self.spec_resize_ex = spec_rezise_ex
 
