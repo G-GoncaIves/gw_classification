@@ -44,6 +44,7 @@ class My_DataSet(Dataset):
 			print(f"\n\n\n One hot dict: \n {self.one_hot} \n\n\n")
 		else:
 			self.one_hot = label_dict
+			print(f"\n\n\n One hot dict: \n {self.one_hot} \n\n\n")
 
 		# Variable that dictates wether SpecAug is aplied or not:
 		self.spec_aug = None
@@ -86,8 +87,8 @@ class My_DataSet(Dataset):
 		if self.spec_aug == True:
 
 			time_bins, freq_bins = spec.shape
-			freq_mask = torchaudio.transforms.FrequencyMasking(freq_bins)
-			time_mask = torchaudio.transforms.TimeMasking(time_bins)
+			freq_mask = torchaudio.transforms.FrequencyMasking(freq_bins/2)
+			time_mask = torchaudio.transforms.TimeMasking(time_bins/2)
 
 			spec = spec.to(torch.float32)
 			spec = freq_mask(spec)

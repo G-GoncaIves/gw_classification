@@ -85,6 +85,7 @@ def train_model(
                     	audioset_pretrain=args.audioset_pretrain, 
 	    				model_size='base384', 
                     	exp_dir=args.exp_dir,
+                    	pretrained_weights_path=args.pretrained_weights_path,
                     	verbose=verbose
                     )
 	if verbose:

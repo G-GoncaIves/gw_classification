@@ -55,7 +55,8 @@ class ASTModel(nn.Module):
         input_tdim=1024, 
         imagenet_pretrain=True, 
         audioset_pretrain=False,
-        exp_dir=None, 
+        exp_dir=None,
+        pretrained_weights_path=None,
         model_size='base384', 
         verbose=True
         ):
@@ -129,15 +130,11 @@ class ASTModel(nn.Module):
             device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
             
             assert exp_dir, f"Direcotry for export not specified."
-            pretr_w_dir = os.path.join(exp_dir, "pretrained_weights")
-            if not os.path.isdir(pretr_w_dir):
-                os.mkdir(pretr_w_dir)
-            pretrained_weights_path = os.path.join(pretr_w_dir, "audioset_10_10_0.4593.pth")
-            
-            if os.path.exists(pretrained_weights_path) == False:
-                # this model performs 0.4593 mAP on the audioset eval set
-                audioset_mdl_url = 'https://www.dropbox.com/s/cv4knew8mvbrnvq/audioset_0.4593.pth?dl=1'
-                wget.download(audioset_mdl_url, out=pretrained_weights_path)
+            assert pretrained_weights_path, f"File with pretrained weights not specified."
+
+            # this model performs 0.4593 mAP on the audioset eval set
+            # audioset_mdl_url = 'https://www.dropbox.com/s/cv4knew8mvbrnvq/audioset_0.4593.pth?dl=1'
+            # wget.download(audioset_mdl_url, out=pretrained_weights_path)
             
             sd = torch.load(pretrained_weights_path, map_location=device)
             audio_model = ASTModel(label_dim=527, fstride=10, tstride=10, input_fdim=128, input_tdim=1024, imagenet_pretrain=False, audioset_pretrain=False, model_size='base384', verbose=False)

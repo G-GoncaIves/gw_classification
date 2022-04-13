@@ -82,7 +82,7 @@ def train(audio_model, train_loader, val_loader, train_conf):
 	# dataset specific settings
 	#scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='max', factor=0.5, patience=train_conf["lr"]_patience, verbose=True)
 	
-	scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, [2,3,4,5], gamma=0.5, last_epoch=-1)
+	scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, [10,20,30,40], gamma=0.5, last_epoch=-1)
 	main_metrics = 'mAP'
 	loss_fn = nn.BCEWithLogitsLoss()
 	warmup = True
@@ -183,14 +183,14 @@ def train(audio_model, train_loader, val_loader, train_conf):
 			# Saves Best model state to memory.
 			best_model_path = os.path.join(exp_dir, "saved_states", "best_audio_model.pth")
 			best_optim_path = os.path.join(exp_dir, "saved_states", "best_optim.pth")
-			torch.save(audio_model.state_dict(), best_model_path)
-			torch.save(optimizer.state_dict(), best_optim_path)
+			torch.save(audio_model, best_model_path)
+			torch.save(optimizer, best_optim_path)
 
 		# Saves Current model state to memory.
 		current_model_path = os.path.join(exp_dir, "saved_states", "latest_audio_model.pth")
 		current_optim_path = os.path.join(exp_dir, "saved_states", "latest_optim.pth")
-		torch.save(audio_model.state_dict(), current_model_path)
-		torch.save(audio_model.state_dict(), current_optim_path)
+		torch.save(audio_model, current_model_path)
+		torch.save(optimizer, current_optim_path)
 		
 		# Checks memory allocation.
 		peak_cuda_memory_allocation = torch.cuda.max_memory_allocated() * 9.3132257461548e-10 
@@ -271,8 +271,10 @@ def validate(audio_model, val_loader, train_conf, verbose, bar_generator):
 
 			# compute output
 			audio_output = audio_model(audio_input)
-			audio_output = torch.sigmoid(audio_output)
-			predictions = audio_output.to('cpu').detach()
+			#audio_output = torch.sigmoid(audio_output)
+			smax = torch.nn.Softmax()
+			audio_output = smax(audio_output)
+			predictions = audio_output.detach().to('cpu')
 
 			A_predictions.append(predictions)
 			A_targets.append(labels)

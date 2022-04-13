@@ -114,6 +114,12 @@
 					"metavar" : ""
 				},
 				{
+					"name" : "pretrained_weights_path",
+					"type" : "str",
+					"help" : "path to pretrained weights file",
+					"metavar" : ""
+				},
+				{
 					"name" : "verbose",
 					"action" : "store_true",
 					"help" : "set to true to get train porgress information."
