@@ -82,7 +82,7 @@ def train(audio_model, train_loader, val_loader, train_conf):
 	# dataset specific settings
 	#scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='max', factor=0.5, patience=train_conf["lr"]_patience, verbose=True)
 	
-	scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, [10,20,30,40], gamma=0.5, last_epoch=-1)
+	scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, [5,10,20,30], gamma=0.5, last_epoch=-1)
 	main_metrics = 'mAP'
 	loss_fn = nn.BCEWithLogitsLoss()
 	warmup = True
@@ -271,7 +271,7 @@ def validate(audio_model, val_loader, train_conf, verbose, bar_generator):
 
 			# compute output
 			audio_output = audio_model(audio_input)
-			#audio_output = torch.sigmoid(audio_output)
+			###audio_output = torch.sigmoid(audio_output)
 			smax = torch.nn.Softmax()
 			audio_output = smax(audio_output)
 			predictions = audio_output.detach().to('cpu')
