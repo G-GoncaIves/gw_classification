@@ -326,6 +326,7 @@ class Generator:
 
 
 
+
 if __name__ == "__main__":
 	
 	parser = argparse.ArgumentParser(description="Generate GW time-series data.")
