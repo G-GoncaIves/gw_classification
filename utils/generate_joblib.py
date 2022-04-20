@@ -93,6 +93,8 @@ class Models:
 		self.mmin = mmin
 		self.mmax = mmax
 
+		self.rng = np.random.default_rng()
+
 		self.inclination_dist = SinAngle(inclination=None)
         
 	@property
@@ -114,10 +116,9 @@ class Models:
 		return np.random.normal(loc=0, scale=lamb*0.1)
 
 	def random_config(self, include_error: bool = False) -> dict:
-		rng = np.random.default_rng()
 
-		mass1 = float(rng.uniform(self.mmin, self.mmax))
-		mass2 = float(rng.uniform(self.mmin, mass1))
+		mass1 = float(self.rng.uniform(self.mmin, self.mmax))
+		mass2 = float(self.rng.uniform(self.mmin, self.mmax))
 
 		lambda1 = float(self.mass2lambda(mass1))
 		lambda2 = float(self.mass2lambda(mass2))
@@ -142,7 +143,7 @@ class Generator:
 
 	def __init__(self, work_dir: str = "gw_ts", model_name: str = None, model_file: str = None,
 				 sample_rate: float = 4096, distance: float = 39, fmin: float = 20,
-				 approximant: str = "IMRPhenomPv2_NRTidalv2"):
+				 approximant: str = "IMRPhenomPv2_NRTidalv2", model_config: dict = {}):
 
 		self.work_dir = os.path.normpath(work_dir)
 
@@ -163,16 +164,16 @@ class Generator:
 		if model_name:
 			try:
 				if model_file:
-					self.model = Models(model_name=model_name, data_file=model_file)
+					self.model = Models(model_name=model_name, data_file=model_file, **model_config)
 				else:
-					self.model = Models(model_name=model_name)
+					self.model = Models(model_name=model_name, **model_config)
+
 			except Exception as e:
-				print(f"Couldn't load model. Defaulting to random generator.\n\tINFO:{e}")
-				self.model = RandomModel()
-				self.model_name = "random"
+				raise ValueError(f"Couldn't load model. Defaulting to random generator.\n\tINFO:{e}")
+				
 		else:
 			self.model_name = "random"
-			self.model = RandomModel()
+			self.model = RandomModel(**model_config)
 
 	@staticmethod
 	def gen_data_strain(config: dict):
@@ -343,10 +344,15 @@ if __name__ == "__main__":
 
 	args = parser.parse_args()
 
+	config = {}
+	config["mmin"] = 1
+	config["mmax"] = 1.5
+
 	# Generate
 	gen = Generator(work_dir=args.w,
 					model_name=args.model_name,
-					model_file=args.model_file
+					model_file=args.model_file,
+					model_config=config
 					)
 
 	out_file = os.path.join(args.w, "dataset.h5")
