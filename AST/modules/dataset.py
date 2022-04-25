@@ -84,17 +84,6 @@ class My_DataSet(Dataset):
 		spec = self.spectograms[idx]
 		label = self.labels[idx]
 
-		if self.spec_aug == True:
-
-			time_bins, freq_bins = spec.shape
-			freq_mask = torchaudio.transforms.FrequencyMasking(freq_bins/2)
-			time_mask = torchaudio.transforms.TimeMasking(time_bins/2)
-
-			spec = spec.to(torch.float32)
-			spec = freq_mask(spec)
-			spec = time_mask(spec)
-			spec = spec.to(torch.float16)
-
 		if self.mix_up == True:
 
 			random_idx = random.randint(0, len(self.spectograms)-1)
@@ -105,6 +94,17 @@ class My_DataSet(Dataset):
 
 			spec = _lambda * spec + (1 - _lambda) * random_spec
 			label = _lambda * label + (1 - _lambda) * random_label
+
+		if self.spec_aug == True:
+
+			time_bins, freq_bins = spec.shape
+			freq_mask = torchaudio.transforms.FrequencyMasking(freq_bins/2)
+			time_mask = torchaudio.transforms.TimeMasking(time_bins/2)
+
+			spec = spec.to(torch.float32)
+			spec = freq_mask(spec)
+			spec = time_mask(spec)
+			spec = spec.to(torch.float16)
 
 
 		# The output spec shape is [time_frame_num, frequency_bins], e.g., [1024, 128]
