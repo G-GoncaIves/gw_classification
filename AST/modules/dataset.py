@@ -95,6 +95,18 @@ class My_DataSet(Dataset):
 			spec = time_mask(spec)
 			spec = spec.to(torch.float16)
 
+		if self.mix_up == True:
+
+			random_idx = random.randint(0, len(self.spectograms)-1)
+			random_spec = self.spectograms[random_idx]
+			random_label = self.labels[random_idx]
+
+			_lambda = np.random.beta(10, 10)
+
+			spec = _lambda * spec + (1 - _lambda) * random_spec
+			label = _lambda * label + (1 - _lambda) * random_label
+
+
 		# The output spec shape is [time_frame_num, frequency_bins], e.g., [1024, 128]
 		return spec, label
 
@@ -184,23 +196,19 @@ class Spectrograms(My_DataSet):
 		verbose=False,
 		spec_rezise_ex=True,
 		label_dict:dict = None,
-		mix_up:bool = False,
-		_lambda:float = 0
+		mix_up:bool = False
 		):
 		
 		super().__init__(input_hdf5_path=input_hdf5_path, label_dict=label_dict)
 
 		self.spec_resize_ex = spec_rezise_ex
+		self.mix_up = mix_up
 
 		self.hdf5_path = input_hdf5_path
 		assert os.path.isfile(self.hdf5_path), f"Spectrogram HDF5 not found. Checked {self.hdf5_path}"
 	   
 		self.load_spectrograms()
 		print("loaded spectograms")
-
-		if mix_up:
-			self.mix_up_data(_lambda=_lambda)
-
 
 	def load_spectrograms(self):
 
@@ -242,7 +250,7 @@ class Spectrograms(My_DataSet):
 			self.spectograms.append(spec_tensor.half())
 			self.labels.append(label)
 
-
+"""
 	def mix_up_data(self):
 
 		print(f"Using mixup with lambda={_lambda}")
@@ -289,3 +297,4 @@ class Spectrograms(My_DataSet):
 
 		del mixed_spectrograms
 		del mixed_labels
+"""

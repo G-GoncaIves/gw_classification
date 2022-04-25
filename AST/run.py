@@ -44,13 +44,13 @@ def train_model(
 		if verbose:
 			time = datetime.now() - global_start_time
 			print(f"\t > Loading Dataset to memory ... [{time}]")
-			global_dataset = dataset(args.data_train, verbose=True, mix_up=args.mix_up, _lambda=args._lambda)
+			global_dataset = dataset(args.data_train, verbose=True, mix_up=args.mix_up)
 			time = datetime.now() - global_start_time
 			print(f"\t > Global Dataset successfully loaded to memory. [{time}]")
 			csv_path = os.path.join(args.exp_dir, "stats.csv")
 			global_dataset.record_stats(csv_path=csv_path)
 		else:
-			global_dataset = dataset(args.data_train, mix_up=args.mix_up, _lambda=args._lambda)
+			global_dataset = dataset(args.data_train, mix_up=args.mix_up)
 			
 		train_ratio, val_ratio = 0.8, 0.2
 		train_portion = int(len(global_dataset) * train_ratio)
@@ -64,8 +64,8 @@ def train_model(
 			time = datetime.now() - global_start_time
 			print(f"\t > Loading Dataset to memory ... [{time}]")
 		
-			train_dataset = dataset(args.data_train, verbose=True, mix_up=args.mix_up, _lambda=args._lambda)
-			val_dataset = dataset(args.data_val, verbose=True, mix_up=args.mix_up, _lambda=args._lambda)
+			train_dataset = dataset(args.data_train, verbose=True, mix_up=args.mix_up)
+			val_dataset = dataset(args.data_val, verbose=True, mix_up=args.mix_up)
 
 			time = datetime.now() - global_start_time
 			print(f"\t > Global Dataset successfully loaded to memory. [{time}]")
@@ -78,8 +78,8 @@ def train_model(
 
 		else:
 			
-			train_dataset = dataset(args.data_train, mix_up=args.mix_up, _lambda=args._lambda)
-			val_dataset = dataset(args.data_val, mix_up=args.mix_up, _lambda=args._lambda)
+			train_dataset = dataset(args.data_train, mix_up=args.mix_up)
+			val_dataset = dataset(args.data_val, mix_up=args.mix_up)
 	
 	if verbose:
 		time = datetime.now() - global_start_time
