@@ -39,21 +39,47 @@ def train_model(
 
 	target_length = 1024
 	
-	if verbose:
-		time = datetime.now() - global_start_time
-		print(f"\t > Loading Dataset to memory ... [{time}]")
-		global_dataset = dataset(args.data_train, verbose=True)
-		time = datetime.now() - global_start_time
-		print(f"\t > Global Dataset successfully loaded to memory. [{time}]")
-		csv_path = os.path.join(args.exp_dir, "stats.csv")
-		global_dataset.record_stats(csv_path=csv_path)
+	if args.data_train == args.data_val:
+
+		if verbose:
+			time = datetime.now() - global_start_time
+			print(f"\t > Loading Dataset to memory ... [{time}]")
+			global_dataset = dataset(args.data_train, verbose=True, mix_up=args.mix_up, _lambda=args._lambda)
+			time = datetime.now() - global_start_time
+			print(f"\t > Global Dataset successfully loaded to memory. [{time}]")
+			csv_path = os.path.join(args.exp_dir, "stats.csv")
+			global_dataset.record_stats(csv_path=csv_path)
+		else:
+			global_dataset = dataset(args.data_train, mix_up=args.mix_up, _lambda=args._lambda)
+			
+		train_ratio, val_ratio = 0.8, 0.2
+		train_portion = int(len(global_dataset) * train_ratio)
+		val_portion = len(global_dataset) - train_portion
+		train_dataset, val_dataset = torch.utils.data.random_split(global_dataset, [train_portion, val_portion])
+
 	else:
-		global_dataset = dataset(args.data_train)
+
+		if verbose:
+
+			time = datetime.now() - global_start_time
+			print(f"\t > Loading Dataset to memory ... [{time}]")
 		
-	train_ratio, val_ratio = 0.8, 0.2
-	train_portion = int(len(global_dataset) * train_ratio)
-	val_portion = len(global_dataset) - train_portion
-	train_dataset, val_dataset = torch.utils.data.random_split(global_dataset, [train_portion, val_portion])
+			train_dataset = dataset(args.data_train, verbose=True, mix_up=args.mix_up, _lambda=args._lambda)
+			val_dataset = dataset(args.data_val, verbose=True, mix_up=args.mix_up, _lambda=args._lambda)
+
+			time = datetime.now() - global_start_time
+			print(f"\t > Global Dataset successfully loaded to memory. [{time}]")
+			
+			train_csv_path = os.path.join(args.exp_dir, "train_stats.csv")
+			val_csv_path = os.path.join(args.exp_dir, "val_stats.csv")
+
+			train_dataset.record_stats(csv_path=train_csv_path)
+			val_dataset.record_stats(csv_path=val_csv_path)
+
+		else:
+			
+			train_dataset = dataset(args.data_train, mix_up=args.mix_up, _lambda=args._lambda)
+			val_dataset = dataset(args.data_val, mix_up=args.mix_up, _lambda=args._lambda)
 	
 	if verbose:
 		time = datetime.now() - global_start_time

@@ -157,7 +157,10 @@ def train(audio_model, train_loader, val_loader, train_conf):
 
 		#
 		stats, valid_loss = validate(audio_model, val_loader, train_conf, verbose, bar_generator=batch_progress_bar_generator)
-
+		
+		"""
+		"""
+		"""
 		mAP = np.mean([stat['AP'] for stat in stats])
 		mAUC = np.mean([stat['auc'] for stat in stats])
 		acc = stats[0]['acc']
@@ -166,7 +169,19 @@ def train(audio_model, train_loader, val_loader, train_conf):
 		middle_rs = [stat['recalls'][int(len(stat['recalls'])/2)] for stat in stats]
 		average_precision = np.mean(middle_ps)
 		average_recall = np.mean(middle_rs)
+		"""
+		"""
+		"""
+		
+		mAP = 0
+		mAUC = 0
+		acc = 0
 
+		middle_ps = 0
+		middle_rs = 0
+		average_precision = 0
+		average_recall = 0
+		
 		train_loss = loss_meter.avg
 
 		if train_loss < best_train_loss:
@@ -197,6 +212,7 @@ def train(audio_model, train_loader, val_loader, train_conf):
 
 		# Saves current and best metrics to a txt file.
 		recibo_path = os.path.join(exp_dir, "recibo.txt")
+		print(recibo_path)
 		recibo(
 			start_time = begin_date,
 			current_time = datetime.datetime.now(),
@@ -293,7 +309,8 @@ def validate(audio_model, val_loader, train_conf, verbose, bar_generator):
 		audio_output = torch.cat(A_predictions)
 		target = torch.cat(A_targets)
 		loss = np.mean(A_loss)
-		stats = calculate_stats(audio_output, target)
+		#stats = calculate_stats(output=audio_output, target=target)
+		stats = []
 
 	return stats, loss
 

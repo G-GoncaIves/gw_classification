@@ -123,6 +123,17 @@
 					"name" : "verbose",
 					"action" : "store_true",
 					"help" : "set to true to get train porgress information."
+				},
+				{
+					"name" : "mix_up",
+					"action" : "store_true",
+					"help" : "set to true to enable mix_up."
+				},
+				{
+					"name" : "_lambda",
+					"type" : "float",
+					"help" : "value of constant used for mix_up.",
+					"metavar" : ""
 				}
 			]
 }

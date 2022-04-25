@@ -2,6 +2,7 @@
 import os
 import atexit
 from datetime import datetime
+import random
 
 # Installed:
 import h5py
@@ -49,7 +50,6 @@ class My_DataSet(Dataset):
 		# Variable that dictates wether SpecAug is aplied or not:
 		self.spec_aug = None
 
-
 	def get_keys(self, h5_file):
 		keys = []
 		h5_file.visit(lambda key: keys.append(key) if isinstance(h5_file[key], h5py.Dataset) else None)
@@ -76,7 +76,7 @@ class My_DataSet(Dataset):
 					model,
 					access_type = access_type,
 					csv_path = csv_path
-					)
+					) 
 
 	def __getitem__(self, idx):
 		"""
@@ -183,7 +183,9 @@ class Spectrograms(My_DataSet):
 		input_hdf5_path: str,
 		verbose=False,
 		spec_rezise_ex=True,
-		label_dict:dict = None
+		label_dict:dict = None,
+		mix_up:bool = False,
+		_lambda:float = 0
 		):
 		
 		super().__init__(input_hdf5_path=input_hdf5_path, label_dict=label_dict)
@@ -194,6 +196,11 @@ class Spectrograms(My_DataSet):
 		assert os.path.isfile(self.hdf5_path), f"Spectrogram HDF5 not found. Checked {self.hdf5_path}"
 	   
 		self.load_spectrograms()
+		print("loaded spectograms")
+
+		if mix_up:
+			self.mix_up_data(_lambda=_lambda)
+
 
 	def load_spectrograms(self):
 
@@ -235,3 +242,48 @@ class Spectrograms(My_DataSet):
 			self.spectograms.append(spec_tensor.half())
 			self.labels.append(label)
 
+
+	def mix_up_data(self, _lambda):
+
+		print(f"Using mixup with lambda={_lambda}")
+
+		data_size = len(self.spectograms)
+		perm_idx = random.sample(range(data_size), data_size)
+
+		spectograms_2 = [self.spectograms[i] for i in perm_idx]
+		labels_2 = [self.labels[i] for i in perm_idx]
+
+		mixed_spectrograms, mixed_labels = [], []
+		for k  in tqdm(range(len(self.spectograms))):
+
+			mixed_spectrogram = _lambda * self.spectograms[k] + (1 - _lambda) * spectograms_2[k]
+			mixed_label = _lambda * self.labels[k] + (1 - _lambda) * labels_2[k]
+
+			mixed_spectrograms.append(mixed_spectrogram)
+			mixed_labels.append(mixed_label)
+
+			if k == 0:
+				import matplotlib.pyplot as plt
+
+				spec_file_name = "/home/goncalo/gw_classification/mixed_spec.png"
+				spec1_file_name = "/home/goncalo/gw_classification/spec1.png"
+				spec2_file_name = "/home/goncalo/gw_classification/spec2.png"
+
+				spec_array = mixed_spectrogram.numpy()
+				spec1_array = self.spectograms[k].numpy()
+				spec2_array = spectograms_2[k].numpy()
+
+				plt.imsave(spec_file_name, spec_array, cmap="turbo", origin="lower")
+				plt.imsave(spec1_file_name, spec2_array, cmap="turbo", origin="lower")
+				plt.imsave(spec2_file_name, spec1_array, cmap="turbo", origin="lower")
+
+
+		self.spectograms = mixed_spectrograms
+		self.labels = mixed_labels
+
+
+		del spectograms_2
+		del labels_2
+
+		del mixed_spectrograms
+		del mixed_labels
