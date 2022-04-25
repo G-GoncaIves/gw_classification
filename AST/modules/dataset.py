@@ -243,7 +243,7 @@ class Spectrograms(My_DataSet):
 			self.labels.append(label)
 
 
-	def mix_up_data(self, _lambda):
+	def mix_up_data(self):
 
 		print(f"Using mixup with lambda={_lambda}")
 
@@ -252,6 +252,8 @@ class Spectrograms(My_DataSet):
 
 		spectograms_2 = [self.spectograms[i] for i in perm_idx]
 		labels_2 = [self.labels[i] for i in perm_idx]
+
+		_lambda = np.random.beta(10, 10)
 
 		mixed_spectrograms, mixed_labels = [], []
 		for k  in tqdm(range(len(self.spectograms))):
