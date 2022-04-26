@@ -74,6 +74,7 @@ class RandomModel:
 			'lambda1': lambda1,
 			'lambda2': lambda2,
 		}
+		print(config)
 		return config
 
 
@@ -92,8 +93,6 @@ class Models:
 
 		self.mmin = mmin
 		self.mmax = mmax
-
-		self.rng = np.random.default_rng()
 
 		self.inclination_dist = SinAngle(inclination=None)
         
@@ -117,8 +116,10 @@ class Models:
 
 	def random_config(self, include_error: bool = False) -> dict:
 
-		mass1 = float(self.rng.uniform(self.mmin, self.mmax))
-		mass2 = float(self.rng.uniform(self.mmin, self.mmax))
+		rng = np.random.default_rng()
+
+		mass1 = float(rng.uniform(self.mmin, self.mmax))
+		mass2 = float(rng.uniform(self.mmin, self.mmax))
 
 		lambda1 = float(self.mass2lambda(mass1))
 		lambda2 = float(self.mass2lambda(mass2))
@@ -136,6 +137,7 @@ class Models:
 			'lambda2': lambda2,
 			"inclination": inclination
 		}
+		print(config)
 		return config
 
 
