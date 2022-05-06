@@ -74,7 +74,6 @@ class RandomModel:
 			'lambda1': lambda1,
 			'lambda2': lambda2,
 		}
-		print(config)
 		return config
 
 
@@ -348,8 +347,8 @@ if __name__ == "__main__":
 	args = parser.parse_args()
 
 	config = {}
-	config["mmin"] = 1
-	config["mmax"] = 1.5
+	config["mmin"] = 1.0
+	config["mmax"] = 2.0
 
 	# Generate
 	gen = Generator(work_dir=args.w,
