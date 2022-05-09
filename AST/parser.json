@@ -131,19 +131,19 @@
 				},
 				{
 					"name" : "mass_range",
-					"type" : "tuple",
+					"type" : "str",
 					"help" : "range of masses used for training.",
 					"metavar" : ""
 				},
 				{
 					"name" : "lambda_range",
-					"type" : "tuple",
+					"type" : "str",
 					"help" : "range of lambdas used for training.",
 					"metavar" : ""
 				},
 				{
 					"name" : "desired_eos",
-					"type" : "list",
+					"type" : "str",
 					"help" : "list of EOS used for training.",
 					"metavar" : ""
 				}

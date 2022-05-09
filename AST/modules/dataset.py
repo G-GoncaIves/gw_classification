@@ -199,9 +199,9 @@ class Spectrograms(My_DataSet):
 		spec_rezise_ex=True,
 		label_dict:dict = None,
 		mix_up:bool = False,
-		mass_range:tuple = None,
-		lambda_range:tuple = None,
-		desired_eos:list = None
+		mass_range:str = None,
+		lambda_range:str = None,
+		desired_eos:str = None
 		):
 		
 		super().__init__(input_hdf5_path=input_hdf5_path, label_dict=label_dict)
@@ -216,17 +216,22 @@ class Spectrograms(My_DataSet):
 
 		self.mass_range = mass_range
 		if mass_range is not None:
-			self.mass_min, self.mass_max = float(mass_range[0]), float(mass_range[1])
+
+			mass_min_str, mass_max_str = mass_range.split(",")
+			self.mass_min, self.mass_max = float(mass_min_str), float(mass_max_str)
 			constraint_string += f"\n\t Mass Range = [{self.mass_min:.1f}, {self.mass_max:.1f}]"
 
 		self.lambda_range = lambda_range
 		if lambda_range is not None:
-			self.lambda_min, self.lambda_max = float(lambda_range[0]), float(lambda_range[1])
+
+			lambda_min_str, lambda_max_str = lambda_range.split(",")
+			self.lambda_min, self.lambda_max = float(lambda_min_str), float(lambda_max_str)
 			constraint_string += f"\n\t Lambda Range = [{self.lambda_min:.1f}, {self.lambda_max:.1f}]"
 
 		self.desired_eos = desired_eos
 		if desired_eos is not None:
-			self.desired_eos = [str(i) for i in desired_eos]
+
+			self.desired_eos = list(desired_eos.split(","))
 			constraint_string += f"\n\t EOS used = {desired_eos}"
 
 		if len(constraint_string) > 0:
