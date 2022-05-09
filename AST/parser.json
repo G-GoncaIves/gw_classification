@@ -130,9 +130,21 @@
 					"help" : "set to true to enable mix_up."
 				},
 				{
-					"name" : "_lambda",
-					"type" : "float",
-					"help" : "value of constant used for mix_up.",
+					"name" : "mass_range",
+					"type" : "tuple",
+					"help" : "range of masses used for training.",
+					"metavar" : ""
+				},
+				{
+					"name" : "lambda_range",
+					"type" : "tuple",
+					"help" : "range of lambdas used for training.",
+					"metavar" : ""
+				},
+				{
+					"name" : "desired_eos",
+					"type" : "list",
+					"help" : "list of EOS used for training.",
 					"metavar" : ""
 				}
 			]

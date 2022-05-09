@@ -6,7 +6,8 @@ known_types = {
 	"int" : int,
 	"float" : float,
 	"str" : str,
-	"bool" : bool
+	"bool" : bool,
+	"tuple" : tuple
 	}
 
 def json_to_parser(json_path, subparsers):

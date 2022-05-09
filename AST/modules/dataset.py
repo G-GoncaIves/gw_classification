@@ -3,6 +3,7 @@ import os
 import atexit
 from datetime import datetime
 import random
+import collections
 
 # Installed:
 import h5py
@@ -41,7 +42,8 @@ class My_DataSet(Dataset):
 		unique_labels = list(set(self.data["waveforms"][d].attrs["model"] for d in self.keys))
 
 		if label_dict is None:
-			self.one_hot = {name: torch.FloatTensor([0]*i + [1] + [0]*(len(unique_labels)-i-1)) for i, name in enumerate(unique_labels)}
+			raw_one_hot = {name: torch.FloatTensor([0]*i + [1] + [0]*(len(unique_labels)-i-1)) for i, name in enumerate(unique_labels)}
+			self.one_hot = collections.OrderedDict(sorted(raw_one_hot.items()))
 			print(f"\n\n\n One hot dict: \n {self.one_hot} \n\n\n")
 		else:
 			self.one_hot = label_dict
@@ -196,7 +198,10 @@ class Spectrograms(My_DataSet):
 		verbose=False,
 		spec_rezise_ex=True,
 		label_dict:dict = None,
-		mix_up:bool = False
+		mix_up:bool = False,
+		mass_range:tuple = None,
+		lambda_range:tuple = None,
+		desired_eos:list = None
 		):
 		
 		super().__init__(input_hdf5_path=input_hdf5_path, label_dict=label_dict)
@@ -206,7 +211,31 @@ class Spectrograms(My_DataSet):
 
 		self.hdf5_path = input_hdf5_path
 		assert os.path.isfile(self.hdf5_path), f"Spectrogram HDF5 not found. Checked {self.hdf5_path}"
-	   
+   
+		constraint_string = ""
+
+		self.mass_range = mass_range
+		if mass_range is not None:
+			self.mass_min, self.mass_max = float(mass_range[0]), float(mass_range[1])
+			constraint_string += f"\n\t Mass Range = [{self.mass_min:.1f}, {self.mass_max:.1f}]"
+
+		self.lambda_range = lambda_range
+		if lambda_range is not None:
+			self.lambda_min, self.lambda_max = float(lambda_range[0]), float(lambda_range[1])
+			constraint_string += f"\n\t Lambda Range = [{self.lambda_min:.1f}, {self.lambda_max:.1f}]"
+
+		self.desired_eos = desired_eos
+		if desired_eos is not None:
+			self.desired_eos = [str(i) for i in desired_eos]
+			constraint_string += f"\n\t EOS used = {desired_eos}"
+
+		if len(constraint_string) > 0:
+			print(f"Train Set Constraints: \n", constraint_string)			
+
+		self.class_sample_count = {}
+		for model in self.one_hot.keys():
+			self.class_sample_count[model] = 0
+
 		self.load_spectrograms()
 		print("loaded spectograms")
 
@@ -214,38 +243,63 @@ class Spectrograms(My_DataSet):
 
 		for k in tqdm(self.keys, leave=False):
 
-
 			# This is an instance of 'h5py._hl.dataset.Dataset', hence the name
 			spec_dataset = self.data["waveforms"][k]
-			# Converted to an instance of 'numpy.ndarray'
-			spec_array = np.asarray(spec_dataset)
-			# Converted to an instance of 'torch.Tensor'
-			spec_tensor = torch.from_numpy(spec_array)
-			
-			spec_model = spec_dataset.attrs["model"]
-			label = self.one_hot[spec_model]
 
-			spec_dims = spec_tensor.shape
-			assert len(spec_dims) == 2, "Spectrograms in unexpected format."
-			i, j = spec_dims
-			# i - time bins number ; j - frequency bins number
-			if j != 128:
+			valid = True
 
-				transform = Resize((i,128))
-				tensor = torch.reshape(spec_tensor, (1, i, j))
-				transformed_tensor = transform(tensor)
-				spec_tensor = transformed_tensor.squeeze()
+			if self.mass_range is not None:
 
-				if self.spec_resize_ex:
+				for mass in [spec_dataset.attrs["mass1"], spec_dataset.attrs["mass2"]]:
 
-					spec_dir = os.path.dirname(self.hdf5_path)
-					before_spec_file_name = os.path.join(spec_dir, "before_resize_spec.png")
-					after_spec_file_name = os.path.join(spec_dir, "after_resize_spec.png")
+					if mass < self.mass_min or mass > self.mass_max: 
+						valid = False
+
+			if self.lambda_range is not None:
+
+				for _lambda in [spec_dataset.attrs["lambda1"], spec_dataset.attrs["lambda2"]]:  
 					
-					plt.imsave(before_spec_file_name, spec_array, cmap="turbo", origin="lower")
-					plt.imsave(after_spec_file_name, spec_tensor.numpy(), cmap="turbo", origin="lower")
-			
-					self.spec_resize_ex = False
+					if _lambda < self.lambda_min or _lambda > self.lambda_max: 
+						valid = False
 
-			self.spectograms.append(spec_tensor.half())
-			self.labels.append(label)
+			if self.desired_eos is not None:
+
+				if spec_dataset.attrs["model"] not in self.desired_eos:
+					valid = False
+
+			if valid:
+
+				# Converted to an instance of 'numpy.ndarray'
+				spec_array = np.asarray(spec_dataset)
+				# Converted to an instance of 'torch.Tensor'
+				spec_tensor = torch.from_numpy(spec_array)
+				
+				spec_model = spec_dataset.attrs["model"]
+				label = self.one_hot[spec_model]
+
+				self.class_sample_count[spec_model] += 1
+
+				spec_dims = spec_tensor.shape
+				assert len(spec_dims) == 2, "Spectrograms in unexpected format."
+				i, j = spec_dims
+				# i - time bins number ; j - frequency bins number
+				if j != 128:
+
+					transform = Resize((i,128))
+					tensor = torch.reshape(spec_tensor, (1, i, j))
+					transformed_tensor = transform(tensor)
+					spec_tensor = transformed_tensor.squeeze()
+
+					if self.spec_resize_ex:
+
+						spec_dir = os.path.dirname(self.hdf5_path)
+						before_spec_file_name = os.path.join(spec_dir, "before_resize_spec.png")
+						after_spec_file_name = os.path.join(spec_dir, "after_resize_spec.png")
+						
+						plt.imsave(before_spec_file_name, spec_array, cmap="turbo", origin="lower")
+						plt.imsave(after_spec_file_name, spec_tensor.numpy(), cmap="turbo", origin="lower")
+				
+						self.spec_resize_ex = False
+
+				self.spectograms.append(spec_tensor.half())
+				self.labels.append(label)
