@@ -92,7 +92,7 @@ class My_DataSet(Dataset):
 			random_spec = self.spectograms[random_idx]
 			random_label = self.labels[random_idx]
 
-			_lambda = np.random.beta(10, 10)
+			_lambda = np.random.beta(10,10)
 
 			spec = _lambda * spec + (1 - _lambda) * random_spec
 			label = _lambda * label + (1 - _lambda) * random_label
