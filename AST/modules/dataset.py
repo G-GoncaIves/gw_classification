@@ -24,8 +24,7 @@ class My_DataSet(Dataset):
 	def __init__(
 		self, 
 		input_hdf5_path: str,
-		label_dict: dict = None,
-		desired_eos: list = None
+		label_dict: dict = None
 		):
 
 		assert os.path.isfile(input_hdf5_path), f"Input Data File not found. Checked: {input_hdf5_path}"
@@ -40,11 +39,12 @@ class My_DataSet(Dataset):
 		atexit.register(self.data.close)
 
 		# Converts labels into the one hot format:
-		if desired_eos is None:
+		if self.desired_eos is None:
 			unique_labels = list(set(self.data["waveforms"][d].attrs["model"] for d in self.keys))
 
 		else:
-			unique_labels = list(set(desired_eos))
+			unique_labels = sorted(set(self.desired_eos))
+			print(f"unique labels = {unique_labels}")
 
 		if label_dict is None:
 			raw_one_hot = {name: torch.FloatTensor([0]*i + [1] + [0]*(len(unique_labels)-i-1)) for i, name in enumerate(unique_labels)}
@@ -234,7 +234,7 @@ class Spectrograms(My_DataSet):
 		if len(constraint_string) > 0 and verbose:
 			print(f"Train Set Constraints: \n", constraint_string)			
 		
-		super().__init__(input_hdf5_path=input_hdf5_path, label_dict=label_dict, desired_eos=desired_eos)
+		super().__init__(input_hdf5_path=input_hdf5_path, label_dict=label_dict)
 
 		self.spec_resize_ex = spec_rezise_ex
 		self.mix_up = mix_up
