@@ -24,7 +24,8 @@ class My_DataSet(Dataset):
 	def __init__(
 		self, 
 		input_hdf5_path: str,
-		label_dict: dict = None
+		label_dict: dict = None,
+		atributes: list = ["mass1", "mass2", "lambda1", "lambda2", "model"]
 		):
 
 		assert os.path.isfile(input_hdf5_path), f"Input Data File not found. Checked: {input_hdf5_path}"
@@ -38,9 +39,12 @@ class My_DataSet(Dataset):
 		self.keys = self.get_keys(self.data["waveforms"])
 		atexit.register(self.data.close)
 
+		print(len(self.keys))
+		self.atributes = self.get_atributes(waveform_data=self.data["waveforms"], keys=self.keys, atributes_list=atributes)
+
 		# Converts labels into the one hot format:
 		if self.desired_eos is None:
-			unique_labels = list(set(self.data["waveforms"][d].attrs["model"] for d in self.keys))
+			unique_labels = list(set(self.atributes[d]["model"] for d in self.keys))
 
 		else:
 			unique_labels = sorted(set(self.desired_eos))
@@ -57,6 +61,24 @@ class My_DataSet(Dataset):
 		# Variable that dictates wether SpecAug is aplied or not:
 		self.spec_aug = None
 
+	def get_atributes(self, waveform_data, keys, atributes_list):
+
+		required_atributes = {}
+
+		for key in keys:
+
+			required_atributes[key] = {}
+			global_atributes = waveform_data[key].attrs
+
+			for at in global_atributes:
+				for r_at in atributes_list:
+					
+					if r_at in at:
+						required_atributes[key][r_at] = global_atributes[at]
+
+		return required_atributes
+
+
 	def get_keys(self, h5_file):
 		keys = []
 		h5_file.visit(lambda key: keys.append(key) if isinstance(h5_file[key], h5py.Dataset) else None)
@@ -66,7 +88,7 @@ class My_DataSet(Dataset):
 
 		for n, key in enumerate(self.keys):
 		
-			params = self.data["waveforms"][key].attrs
+			params = self.atributes[key]
 			m1 = params["mass1"]
 			m2 = params["mass2"]
 			lambda1 = params["lambda1"]
@@ -171,8 +193,8 @@ class WaveForms(My_DataSet):
 
 		for k in tqdm(self.keys, leave=False):
 
-			waveform_tensor= self.data["waveforms"][k]
-			label = self.one_hot[waveform_tensor.attrs["model"]]
+			waveform_tensor= self.atributes[k]
+			label = self.one_hot[waveform_tensor["model"]]
 
 			# Normalize
 			waveform = np.asarray(waveform_tensor, dtype="f")
@@ -242,9 +264,13 @@ class Spectrograms(My_DataSet):
 		self.hdf5_path = input_hdf5_path
 		assert os.path.isfile(self.hdf5_path), f"Spectrogram HDF5 not found. Checked {self.hdf5_path}"
 
+		self.mass_ratio = {}
 		self.class_sample_count = {}
 		for model in self.one_hot.keys():
+
+			self.mass_ratio[model] = []
 			self.class_sample_count[model] = 0
+
 
 		self.load_spectrograms()
 		print("loaded spectograms")
@@ -254,38 +280,41 @@ class Spectrograms(My_DataSet):
 		for k in tqdm(self.keys, leave=False):
 
 			# This is an instance of 'h5py._hl.dataset.Dataset', hence the name
-			spec_dataset = self.data["waveforms"][k]
+			spec_dataset = self.atributes[k]
 
 			valid = True
 
 			if self.mass_range is not None:
 
-				for mass in [spec_dataset.attrs["mass1"], spec_dataset.attrs["mass2"]]:
+				for mass in [spec_dataset["mass1"], spec_dataset["mass2"]]:
 
 					if mass < self.mass_min or mass > self.mass_max: 
 						valid = False
 
 			if self.lambda_range is not None:
 
-				for _lambda in [spec_dataset.attrs["lambda1"], spec_dataset.attrs["lambda2"]]:  
+				for _lambda in [spec_dataset["lambda1"], spec_dataset["lambda2"]]:  
 					
 					if _lambda < self.lambda_min or _lambda > self.lambda_max: 
 						valid = False
 
 			if self.desired_eos is not None:
 
-				if spec_dataset.attrs["model"] not in self.desired_eos:
+				if spec_dataset["model"] not in self.desired_eos:
 					valid = False
 
 			if valid:
 
 				# Converted to an instance of 'numpy.ndarray'
-				spec_array = np.asarray(spec_dataset)
+				spec_array = np.asarray(self.data["waveforms"][k])
 				# Converted to an instance of 'torch.Tensor'
 				spec_tensor = torch.from_numpy(spec_array)
 				
-				spec_model = spec_dataset.attrs["model"]
+				spec_model = spec_dataset["model"]
 				label = self.one_hot[spec_model]
+
+				ratio = float(spec_dataset["mass1"]) / float(spec_dataset["mass2"]) 
+				self.mass_ratio[spec_model].append(ratio)
 
 				self.class_sample_count[spec_model] += 1
 
