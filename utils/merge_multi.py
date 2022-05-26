@@ -14,11 +14,13 @@ args = parser.parse_args()
 base_dir = args.w 
 
 print(f"Starging merge ({base_dir})")
-files = glob.glob(os.path.join(base_dir, "*/dataset.h5"))
+#files = glob.glob(os.path.join(base_dir, "*/dataset.h5"))
+files = glob.glob(os.path.join(base_dir, "*.h5"))
 
 i = 1   # TODO: Check this
 
-with h5py.File(os.path.join(base_dir, "dataset.h5"), "w") as dataset:
+#with h5py.File(os.path.join(base_dir, "dataset.h5"), "w") as dataset:
+with h5py.File(os.path.join(base_dir, "noisy_dataset.h5"), "w") as dataset:
     grp = dataset.create_group("waveforms")
     for f in tqdm.tqdm(files):
         print(f"Merging {f}...")
