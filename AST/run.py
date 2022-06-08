@@ -153,6 +153,7 @@ def train_model(
 	    				input_fdim=args.fdim,
                     	input_tdim=args.tdim, 
 	    				imagenet_pretrain=args.imagenet_pretrain,
+	    				custom_pretrain=args.custom_pretrain,
                     	audioset_pretrain=args.audioset_pretrain, 
 	    				model_size='base384', 
                     	exp_dir=args.exp_dir,
