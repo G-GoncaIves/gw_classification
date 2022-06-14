@@ -101,10 +101,13 @@ def train(audio_model, train_loader, val_loader, train_conf):
 		epoch_progress_bar_generator = epoch_progress_bar_generator_silent 
 		batch_progress_bar_generator = batch_progress_bar_generator_silent
 		
+	aug_config = {
+		"n" : train_conf["n"],
+		"m" : train_conf["m"]
+	}
+
 	# Enable SpecAug for training:
-	train_loader.dataset.spec_aug = True
-	# Disable SpecAug for validation:
-	val_loader.dataset.spec_aug = False
+	train_loader.dataset.enable_aug(**aug_config)
 
 	for epoch in epoch_progress_bar_generator(total_epochs=train_conf["epochs"]):
 		begin_time = time.time()

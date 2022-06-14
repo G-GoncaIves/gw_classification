@@ -151,6 +151,18 @@
 					"type" : "str",
 					"help" : "list of EOS used for training.",
 					"metavar" : ""
+				},
+				{
+					"name" : "n",
+					"type" : "int",
+					"help" : "number of augmentation layers to use.",
+					"metavar" : ""
+				},
+				{
+					"name" : "m",
+					"type" : "int",
+					"help" : "magnitude of augmentation.",
+					"metavar" : ""
 				}
 			]
 }

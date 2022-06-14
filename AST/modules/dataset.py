@@ -19,6 +19,7 @@ from torchvision.transforms import Resize
 
 # Custom:
 from .recibo import progress_csv
+from .augmentation import RandAug
 
 class My_DataSet(Dataset):
 	def __init__(
@@ -58,8 +59,14 @@ class My_DataSet(Dataset):
 			self.one_hot = label_dict
 			print(f"\n\n\n One hot dict: \n {self.one_hot} \n\n\n")
 
+
 		# Variable that dictates wether SpecAug is aplied or not:
-		self.spec_aug = None
+		self.aug = False
+
+	def enable_aug(self, n=1, m=17, transforms_list=None):
+
+		self.aug = True
+		self.transforms = RandAug(n=n, m=m, desired_transforms=transforms_list)
 
 	def get_atributes(self, waveform_data, keys, atributes_list):
 
@@ -119,103 +126,21 @@ class My_DataSet(Dataset):
 			random_spec = self.spectograms[random_idx]
 			random_label = self.labels[random_idx]
 
-			_lambda = np.random.beta(10,10)
+			#_lambda = np.random.beta(10,10)
+			_lambda = 0.5
 
 			spec = _lambda * spec + (1 - _lambda) * random_spec
 			label = _lambda * label + (1 - _lambda) * random_label
 
-		if self.spec_aug == True:
+		if self.aug == True:
 
-			time_bins, freq_bins = spec.shape
-			freq_mask = torchaudio.transforms.FrequencyMasking(freq_bins/2)
-			time_mask = torchaudio.transforms.TimeMasking(time_bins/2)
-
-			spec = spec.to(torch.float32)
-			spec = freq_mask(spec)
-			spec = time_mask(spec)
-			spec = spec.to(torch.float16)
-
+			spec, label = self.transforms((spec,label))			
 
 		# The output spec shape is [time_frame_num, frequency_bins], e.g., [1024, 128]
 		return spec, label
 
 	def __len__(self):
 		return len(self.spectograms)
-
-class WaveForms(My_DataSet):
-
-	def __init__(
-		self, 
-		input_hdf5_path: str,
-		audio_conf: dict, 
-		norm_mean: float = None, 
-		norm_std: float = None,
-		verbose=False,
-		label_dict:dict = None
-		):
-
-		super().__init__(self, input_hdf5_path=input_hdf5_path, label_dict=label_dict)
-		assert all([required_key in audio_conf.keys() for required_key in ["target_length","num_mel_bins","freqm","timem"]]), "Configuration Dict missing required parameters."
-
-		self.audio_conf = audio_conf
-
-		if norm_mean == None or norm_std == None:
-			self.calc_stats()
-		else:
-			self.norm_mean = norm_mean
-			self.norm_std = norm_std
-
-		self.gen_spectograms()
-
-	def calc_stats(self, indices = None):
-
-		set_mean = []
-		set_std = []
-
-		if indices:
-			keys = (self.keys[i] for i in indices)
-		
-		else:
-			keys = self.keys
-
-		for k in tqdm(keys):
-
-			v = np.array(self.data["waveforms"][k])
-			v_norm = v / v.max()
-
-			set_mean.append(v_norm.mean())
-			set_std.append(v_norm.std())
-
-		self.norm_mean = np.array(set_mean).mean()
-		self.norm_std = np.array(set_std).std()
-
-	def gen_spectograms(self):
-
-		for k in tqdm(self.keys, leave=False):
-
-			waveform_tensor= self.atributes[k]
-			label = self.one_hot[waveform_tensor["model"]]
-
-			# Normalize
-			waveform = np.asarray(waveform_tensor, dtype="f")
-			waveform = waveform / waveform.max()
-
-			# Convert to tensor
-			waveform = torch.from_numpy(waveform)
-			waveform = waveform.reshape((1, -1))
-			
-			spectrogram = abs(cqt(
-									waveform.numpy(),
-									sr = 4096*4,
-									fmin = 32,
-									n_bins = 256,
-									bins_per_octave = 32,
-									hop_length = 128,
-									pad_mode = 'edge'
-									))
-
-			self.spectograms.append(spectrogram)
-			self.labels.append(label)
 
 class Spectrograms(My_DataSet):
 
