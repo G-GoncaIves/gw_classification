@@ -63,10 +63,10 @@ class My_DataSet(Dataset):
 		# Variable that dictates wether SpecAug is aplied or not:
 		self.aug = False
 
-	def enable_aug(self, n=1, m=17, transforms_list=None):
+	def enable_aug(self, n=1, m=17, desired_transforms=None):
 
 		self.aug = True
-		self.transforms = RandAug(n=n, m=m, desired_transforms=transforms_list)
+		self.transforms = RandAug(n=n, m=m, desired_transforms=desired_transforms)
 
 	def get_atributes(self, waveform_data, keys, atributes_list):
 
