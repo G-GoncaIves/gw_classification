@@ -47,7 +47,7 @@ class RandAug():
 
 		image = torch.reshape(image, self.shape)
 
-		return image, sample
+		return image, label
 
 
 	def _identity(self, image, label):
