@@ -45,7 +45,7 @@ class RandAug():
 
 			image, label = augment(image, label)
 
-		image = torch.reshape(image, self.shape)
+		image = torch.reshape(image, self.shape).half()
 
 		return image, label
 
