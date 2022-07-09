@@ -135,7 +135,16 @@ class My_DataSet(Dataset):
 
 		if self.aug == True:
 
-			spec, label = self.transforms((spec,label))			
+			time_bins, freq_bins = spec.shape
+			freq_mask = torchaudio.transforms.FrequencyMasking(freq_bins/2)
+			time_mask = torchaudio.transforms.TimeMasking(time_bins/2)
+
+			spec = spec.to(torch.float32)
+			spec = freq_mask(spec)
+			spec = time_mask(spec)
+			spec = spec.to(torch.float16)
+
+			#spec, label = self.transforms((spec,label))			
 
 		# The output spec shape is [time_frame_num, frequency_bins], e.g., [1024, 128]
 		return spec, label
