@@ -77,12 +77,12 @@ def train(audio_model, train_loader, val_loader, train_conf):
 	audio_model = audio_model.to(device)
 	# Set up the optimizer
 	trainables = [p for p in audio_model.parameters() if p.requires_grad]
-	optimizer = torch.optim.Adam(trainables, train_conf["lr"], weight_decay=5e-7, betas=(0.9, 0.999))
+	optimizer = torch.optim.Adam(trainables, train_conf["lr"], weight_decay=5e-7, betas=(0.95, 0.999))
 
 	# dataset specific settings
 	#scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='max', factor=0.5, patience=train_conf["lr"]_patience, verbose=True)
 	
-	scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, [10,20,30,40], gamma=0.5, last_epoch=-1)
+	scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, [5,10,20,30], gamma=0.5, last_epoch=-1)
 	main_metrics = 'mAP'
 	loss_fn = nn.BCEWithLogitsLoss()
 	warmup = True
@@ -104,7 +104,7 @@ def train(audio_model, train_loader, val_loader, train_conf):
 	aug_config = {
 		"n" : train_conf["n"],
 		"m" : train_conf["m"],
-		"desired_transforms" : None
+		"desired_transforms" : ["SpecAug"]
 	}
 
 	# Enable SpecAug for training:

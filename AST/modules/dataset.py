@@ -63,10 +63,11 @@ class My_DataSet(Dataset):
 		# Variable that dictates wether SpecAug is aplied or not:
 		self.aug = False
 
-	def enable_aug(self, n=1, m=17, desired_transforms=None):
+	def enable_aug(self, n=1, m=15, desired_transforms=None):
 
 		self.aug = True
 		self.transforms = RandAug(n=n, m=m, desired_transforms=desired_transforms)
+		print(self.transforms.transforms)
 
 	def get_atributes(self, waveform_data, keys, atributes_list):
 
@@ -126,8 +127,8 @@ class My_DataSet(Dataset):
 			random_spec = self.spectograms[random_idx]
 			random_label = self.labels[random_idx]
 
-			#_lambda = np.random.beta(10,10)
-			_lambda = 0.5
+			_lambda = np.random.beta(10,10)
+			#_lambda = 0.5
 
 			spec = _lambda * spec + (1 - _lambda) * random_spec
 			label = _lambda * label + (1 - _lambda) * random_label

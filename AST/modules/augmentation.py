@@ -82,8 +82,8 @@ class RandAug():
 	def _specaug(self, image, label):
 
 		time_bins, freq_bins = self.shape
-		freq_mask = FrequencyMasking(freq_bins*self.m/60)
-		time_mask = TimeMasking(time_bins*self.m/60)
+		freq_mask = FrequencyMasking(freq_bins*self.m/30)
+		time_mask = TimeMasking(time_bins*self.m/30)
 
 		image = freq_mask(image)
 		image = time_mask(image)
