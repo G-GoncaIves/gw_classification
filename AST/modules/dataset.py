@@ -244,12 +244,23 @@ class Spectrograms(My_DataSet):
 				spec_array = np.asarray(self.data["waveforms"][k])
 				# Converted to an instance of 'torch.Tensor'
 				spec_tensor = torch.from_numpy(spec_array)
+
+				spec_model = spec_dataset.attrs["model"]
+				
+				try:
+					label = self.one_hot[spec_model]
+				
+				except KeyError:
+					label = "custom"
+					
+
 				
 				spec_model = spec_dataset["model"]
 				label = self.one_hot[spec_model]
 
 				ratio = float(spec_dataset["mass1"]) / float(spec_dataset["mass2"]) 
 				self.mass_ratio[spec_model].append(ratio)
+
 
 				self.class_sample_count[spec_model] += 1
 
