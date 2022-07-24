@@ -90,6 +90,11 @@
 					"help" : "set to true to use ImageNet and audioset pretrained audio spectrogram transformer model."
 				},
 				{
+					"name" : "custom_pretrain",
+					"action" : "store_true",
+					"help" : "set to true to use a custom set of weights."
+				},
+				{
 					"name" : "modules_dir",
 					"type" : "str",
 					"help" : "directory to ast modules.",
@@ -145,6 +150,18 @@
 					"name" : "desired_eos",
 					"type" : "str",
 					"help" : "list of EOS used for training.",
+					"metavar" : ""
+				},
+				{
+					"name" : "n",
+					"type" : "int",
+					"help" : "number of augmentation layers to use.",
+					"metavar" : ""
+				},
+				{
+					"name" : "m",
+					"type" : "int",
+					"help" : "magnitude of augmentation.",
 					"metavar" : ""
 				}
 			]

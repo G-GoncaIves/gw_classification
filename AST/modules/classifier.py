@@ -55,6 +55,7 @@ class ASTModel(nn.Module):
         input_tdim=1024, 
         imagenet_pretrain=True, 
         audioset_pretrain=False,
+        custom_pretrain=False,
         exp_dir=None,
         pretrained_weights_path=None,
         model_size='base384', 
@@ -157,7 +158,29 @@ class ASTModel(nn.Module):
                 new_pos_embed = torch.nn.functional.interpolate(new_pos_embed, size=(12, t_dim), mode='bilinear')
             new_pos_embed = new_pos_embed.reshape(1, 768, num_patches).transpose(1, 2)
             self.v.pos_embed = nn.Parameter(torch.cat([self.v.pos_embed[:, :2, :].detach(), new_pos_embed], dim=1))
+        
+        elif custom_pretrain == True:
+            
+            audio_model = torch.load(pretrained_weights_path, map_location=device)
+            self.v = audio_model.module.v
+            self.original_embedding_dim = self.v.pos_embed.shape[2]
+            self.mlp_head = nn.Sequential(nn.LayerNorm(self.original_embedding_dim), nn.Linear(self.original_embedding_dim, label_dim))
 
+            f_dim, t_dim = self.get_shape(fstride, tstride, input_fdim, input_tdim)
+            num_patches = f_dim * t_dim
+            self.v.patch_embed.num_patches = num_patches
+
+            new_pos_embed = self.v.pos_embed[:, 2:, :].detach().reshape(1, 1212, 768).transpose(1, 2).reshape(1, 768, 12, 101)
+            # if the input sequence length is larger than the original audioset (10s), then cut the positional embedding
+            if t_dim < 101:
+                new_pos_embed = new_pos_embed[:, :, :, 50 - int(t_dim/2): 50 - int(t_dim/2) + t_dim]
+            # otherwise interpolate
+            else:
+                new_pos_embed = torch.nn.functional.interpolate(new_pos_embed, size=(12, t_dim), mode='bilinear')
+            new_pos_embed = new_pos_embed.reshape(1, 768, num_patches).transpose(1, 2)
+            self.v.pos_embed = nn.Parameter(torch.cat([self.v.pos_embed[:, :2, :].detach(), new_pos_embed], dim=1))
+            
+            
     def get_shape(self, fstride, tstride, input_fdim=128, input_tdim=1024):
         test_input = torch.randn(1, 1, input_fdim, input_tdim)
         test_proj = nn.Conv2d(1, self.original_embedding_dim, kernel_size=(16, 16), stride=(fstride, tstride))
