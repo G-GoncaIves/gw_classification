@@ -283,10 +283,14 @@ class Spectrograms(My_DataSet):
 				spec_array = np.asarray(spec_dataset)
 				# Converted to an instance of 'torch.Tensor'
 				spec_tensor = torch.from_numpy(spec_array)
-				
 				spec_model = spec_dataset.attrs["model"]
-				label = self.one_hot[spec_model]
-
+				
+				try:
+					label = self.one_hot[spec_model]
+				
+				except KeyError:
+					label = "custom"
+					
 				self.class_sample_count[spec_model] += 1
 
 				spec_dims = spec_tensor.shape
