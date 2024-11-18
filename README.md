@@ -1,6 +1,6 @@
 # Code for Paper: [Machine-Learning Love: classifying the equation of state of neutron stars with Transformers](https://arxiv.org/abs/2210.08382)
 
-This repository contains the code used for the paper [Your Paper Title Here](https://arxiv.org/abs/2210.08382). 
+This repository contains the code used for the paper [Machine-Learning Love: classifying the equation of state of neutron stars with Transformers](https://arxiv.org/abs/2210.08382). 
 
 ## Overview
 
