@@ -105,33 +105,3 @@ def progress_csv(
 
 	with open(csv_path, access_type) as f: 
 		f.write(line_string)
-
-
-if __name__ == "__main__":
-	
-	import os
-
-	recibo_path = os.path.join("/home/goncalo/", "recibo.txt")
-	recibo(
-		start_time = 0,
-		current_time = 0,
-		epoch = 100,
-		train_loss = 0,
-		val_loss = 0,
-		_map = 0,
-		acc = 0,
-		auc = 0,
-		avg_pre = 0,
-		avg_recall = 0,
-		best_epoch = 0,
-		best_train_loss = 0,
-		best_val_loss = 0,
-		best_map = 0,
-		best_acc = 0,
-		best_auc = 0,
-		best_avg_pre = 0,
-		best_avg_recall = 0,
-		current_state_loc = 0,
-		best_state_loc = "0000000000000000000000000000000000000000000000000000000000000000000000000",
-		recibo_location = recibo_path
-		)
