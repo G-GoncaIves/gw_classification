@@ -2,7 +2,7 @@
 
 **Machine-Learning Love: Classifying the Neutron Star Equation of State with Transformers**
 
-This repository provides the code and assets for “Machine-Learning Love,” a neural-network framework that uses the Audio Spectrogram Transformer (AST) architecture to infer neutron-star equations of state from simulated gravitational-wave and electromagnetic time-series data [\[1\]](https://arxiv.org/abs/2210.08382).
+This repository provides the code and assets for a neural-network framework that uses the Audio Spectrogram Transformer (AST) architecture to infer neutron-star equations of state from simulated gravitational-wave and electromagnetic time-series data [\[1\]](https://arxiv.org/abs/2210.08382).
 
 
 ## Features
