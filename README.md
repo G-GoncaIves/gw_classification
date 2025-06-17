@@ -2,12 +2,12 @@
 
 **Machine-Learning Love: Classifying the Neutron Star Equation of State with Transformers**
 
-This repository provides the code and assets for “Machine-Learning Love,” a neural-network framework that uses the Audio Spectrogram Transformer (AST) architecture to infer neutron-star equations of state from simulated gravitational-wave and electromagnetic time-series data [10].
+This repository provides the code and assets for “Machine-Learning Love,” a neural-network framework that uses the Audio Spectrogram Transformer (AST) architecture to infer neutron-star equations of state from simulated gravitational-wave and electromagnetic time-series data [1](https://arxiv.org/abs/2210.08382).
 
 
 ## Features
 
-- **AST-based Classification**: Leverages the Audio Spectrogram Transformer to process time-delay cosmography and gravitational-wave spectrograms for equation-of-state inference [10].
+- **AST-based Classification**: Leverages the Audio Spectrogram Transformer to process time-delay cosmography and gravitational-wave spectrograms for equation-of-state inference [2](https://arxiv.org/abs/2104.01778).
 - **End-to-End Pipeline**: Includes data preprocessing, model training, evaluation scripts, and post-processing routines.
 - **Simulation-Driven Training**: Trains on synthetic neutron-star observables generated via parameterized spectral fits to relativistic mean-field models.
 - **Uncertainty Quantification**: Implements Bayesian model averaging over multiple AST fine-tuning runs to estimate predictive uncertainties.
@@ -79,4 +79,4 @@ python src/train.py --config experiments/your_experiment.yaml
 
 If you use this code, please cite:
 
-> Gonçalves, G. R., et al. “Machine-Learning Love: classifying the equation of state of neutron stars with Transformers.” *Journal of Cosmology and Astroparticle Physics*, 2024. [https://arxiv.org/abs/2210.08382][10]
+> Gonçalves, G. R., et al. “Machine-Learning Love: classifying the equation of state of neutron stars with Transformers.” *Journal of Cosmology and Astroparticle Physics*, 2024. [1](https://arxiv.org/abs/2210.08382)
